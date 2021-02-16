@@ -1,0 +1,18 @@
+[
+  {
+    "productId": 1,
+    "supplierName": "Amazon",
+    "brandName": "Nike",
+    "description": "Sports Shoes",
+    "size": "medium",
+    "category": "Shoes",
+    "subCategory": "Sports Shoes",
+    "price": 8500,
+    "quantity": 1,
+    "country": "India",
+    "sellerCode": "NY",
+    "createdDateTime": null,
+    "updatedDateTime": null,
+    "stockStatus": "Available"
+  }
+]
