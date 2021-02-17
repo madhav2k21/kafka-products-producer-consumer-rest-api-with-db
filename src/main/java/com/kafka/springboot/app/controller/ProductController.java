@@ -1,10 +1,5 @@
 package com.kafka.springboot.app.controller;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +25,14 @@ public class ProductController {
 	@PostMapping(value = "/products",consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public String addCustomer(@RequestBody List<Product> products) {
 		
-		productService.checkIfProductIsAlreadyExisting(products);
-
-		return productService.addProductsToTopic(products);
+		return productService.addProductsToKafkaTopic(products);
 	}
 	
 	
-	@GetMapping(value = "/products")
+	@GetMapping(value = "/products", produces = {MediaType.APPLICATION_JSON_VALUE} )
 	public List<Product> getProducts() {
 		
-		Product p=new Product();
-		
-		return Arrays.asList(p);
+		return productService.findAllProductsFromDB();
 	}
 	
 

@@ -1,6 +1,7 @@
 package com.kafka.springboot.app.service;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -35,15 +36,16 @@ public class ProductService {
 		this.productRepository = productRepository;
 	}
 
-	public String addProductsToTopic(List<Product> products) {
+	public String addProductsToKafkaTopic(List<Product> products) {
 
 		try {
 			if (!products.isEmpty()) {
 				for (Product product : products) {
 					try {
+						checkIfProductIsAlreadyExisting(product);
 						kafkaTemplate.send(KafkaConstants.TOPIC, product);
 						logger.info("***********Message Published to Kafka topic************");
-						Thread.sleep(1000);
+						Thread.sleep(500);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -61,27 +63,30 @@ public class ProductService {
 		productRepository.save(product);
 		return product;
 	}
+
+	public void checkIfProductIsAlreadyExisting(Product product) {
+
+		Optional<Product> findById = productRepository.findById(product.getProductId());
+
+		if (findById.isPresent()) {
+			Product p = findById.get();
+			product.setCreatedDateTime(p.getCreatedDateTime());
+			product.setUpdatedDateTime(new Timestamp(new Date().getTime()));
+		} else {
+			product.setCreatedDateTime(new Timestamp(new Date().getTime()));
+			product.setUpdatedDateTime(new Timestamp(new Date().getTime()));
+		}
+
+	}
 	
-	public void checkIfProductIsAlreadyExisting(List<Product> products) {
-		
-		
-		products.forEach(product->{
+	public List<Product> findAllProductsFromDB(){
+		List<Product> allProducts = productRepository.findAll();
+		if(allProducts.size()>0) {
 			
-			Optional<Product> findById = productRepository.findById(product.getProductId());
-			
-			if(findById.isPresent()) {
-				Product p = findById.get();
-				product.setCreatedDateTime(p.getCreatedDateTime());
-				product.setUpdatedDateTime(new Timestamp(new Date().getTime()));
-			}else {
-				product.setCreatedDateTime(new Timestamp(new Date().getTime()));
-				product.setUpdatedDateTime(new Timestamp(new Date().getTime()));
-			}
-		});
-		
-		
-		
-		
+			return allProducts;
+		}else {
+			return Arrays.asList(new Product());
+		}
 	}
 
 }
